@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,12 +32,13 @@ import androidx.compose.ui.unit.sp
 import tr.edu.trakya.todolistapp.R
 import tr.edu.trakya.todolistapp.model.Todo
 import tr.edu.trakya.todolistapp.model.getDummyData
+import tr.edu.trakya.todolistapp.viewModels.ToDoViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun ToDoListPage (){    
-    val todoList = getDummyData()
+fun ToDoListPage (viewModel: ToDoViewModel){
+    val todoList by viewModel.todoList.observeAsState()
     var inputText  by remember{
         mutableStateOf("")
     }
@@ -58,25 +60,44 @@ fun ToDoListPage (){
                     Text("New Item")
                 }
             )
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = {
+                viewModel.addItem(inputText)
+                inputText=""
+            }) {
                 Icon(painter = painterResource(id = R.drawable.baseline_add_24),
                     contentDescription = "Add Button",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(40.dp)
                     )
             }
+            IconButton(onClick = {
+                viewModel.clear()
+
+            }) {
+                Icon(painter = painterResource(id = R.drawable.baseline_delete_24),
+                    contentDescription = "Clear Button",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(40.dp)
+                )
+            }
         }
 
-        LazyColumn(content  = {
-            itemsIndexed(todoList){ index: Int, item: Todo ->  
-                ToDoItem(item = item)
-            }
-        })
+        todoList?.let {
+            LazyColumn(content  = {
+                itemsIndexed(it){ index: Int, item: Todo ->
+                    ToDoItem(item = item, onDelete = {
+                        viewModel.removeItem(item.id)
+                    })
+                }
+            })
+        }
+
+
     }
 }
 
 @Composable
-fun ToDoItem (item : Todo){
+fun ToDoItem (item : Todo,onDelete : ()->Unit){
     Row(modifier =
     Modifier
         .fillMaxWidth()
@@ -95,7 +116,7 @@ fun ToDoItem (item : Todo){
             )
             Text(text = item.title,style = TextStyle(fontSize = 20.sp, color = Color.White))
         }
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onDelete) {
             Icon(
                 painter = painterResource(id = R.drawable.baseline_delete_24),
                 contentDescription ="delete_button",
