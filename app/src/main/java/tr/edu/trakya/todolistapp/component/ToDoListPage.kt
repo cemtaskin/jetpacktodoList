@@ -16,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +37,10 @@ import java.util.Locale
 @Composable
 fun ToDoListPage (){    
     val todoList = getDummyData()
+    var inputText  by remember{
+        mutableStateOf("")
+    }
+
     Column (modifier =
     Modifier
         .fillMaxHeight()
@@ -43,7 +51,10 @@ fun ToDoListPage (){
                 modifier = Modifier
                     .weight(1f)
                     .padding(8.dp),
-                value = "", onValueChange ={} , label = {
+                value = inputText,
+                onValueChange ={
+                    inputText=it
+                } , label = {
                     Text("New Item")
                 }
             )
