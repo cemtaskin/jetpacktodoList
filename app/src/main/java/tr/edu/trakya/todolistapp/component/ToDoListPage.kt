@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import tr.edu.trakya.todolistapp.R
 import tr.edu.trakya.todolistapp.model.Todo
-import tr.edu.trakya.todolistapp.model.getDummyData
 import tr.edu.trakya.todolistapp.viewModels.ToDoViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale

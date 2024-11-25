@@ -3,31 +3,39 @@ package tr.edu.trakya.todolistapp.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import tr.edu.trakya.todolistapp.model.ToDoManager
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import tr.edu.trakya.todolistapp.infrastructure.MainApplication
 import tr.edu.trakya.todolistapp.model.Todo
+import java.time.Instant
+import java.util.Date
 
 class ToDoViewModel  : ViewModel(){
-    private var _todoList = MutableLiveData<List<Todo>>()
+    val todoDao  = MainApplication.toToDoDatabase.getTodoDao()
+    private var _todoList = todoDao.getAllToDo()
     val todoList : LiveData<List<Todo>> = _todoList
 
-    fun getAll () {
-        _todoList.value= ToDoManager.getAllToDo()
-    }
+
 
     fun addItem (title :String){
-        ToDoManager.addToDo(title)
-        getAll()
+        viewModelScope.launch  (Dispatchers.IO) {
+            todoDao.add(Todo(id=0,title = title, createdAt = Date.from(Instant.now())))
+        }
+
     }
 
 
     fun removeItem (id:Int){
-        ToDoManager.remove(id)
-        getAll()
+        viewModelScope.launch (Dispatchers.IO){
+            todoDao.delete(id)
+        }
+
     }
 
     fun clear (){
-        ToDoManager.clear()
-        getAll()
+        viewModelScope.launch (Dispatchers.IO){ todoDao.deleteAll()  }
+
     }
 
 }
